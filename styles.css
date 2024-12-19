@@ -1,0 +1,30 @@
+/* styles.css */
+.header {
+    background-color: #0056b3; /* Dark blue */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+.sidebar .sidebar-content {
+    background-color: #003380 !important;  /* Darker blue */
+}
+.main .block-container {
+    background-color: #e0f7fa;  /* Light blue */
+    padding: 20px;
+    border-radius: 10px;
+}
+.sidebar-section {
+    background-color: #81d4fa; /* Sky blue */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.stButton > button {
+    background-color: #039be5; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+.stButton > button:hover {
+    background-color: #e0ec08; /* Darker blue */
+}
