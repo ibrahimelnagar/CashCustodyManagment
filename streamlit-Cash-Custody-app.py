@@ -4,6 +4,14 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+# Check if openpyxl is installed and imported correctly
+try:
+    import openpyxl
+    print("openpyxl is installed and imported successfully.")
+except ImportError:
+    print("openpyxl is not installed. Please install it using 'pip install openpyxl'.")
+    raise
+
 # Paths and constants
 DB_DIR = "./data"
 DB_FILENAME = os.path.join(DB_DIR, "cash_custody.db")
