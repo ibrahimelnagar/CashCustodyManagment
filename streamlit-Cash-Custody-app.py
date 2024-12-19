@@ -295,8 +295,8 @@ with transactions_placeholder.container():
         ])
 
         # Add sorting functionality to the table headers
-        sort_column = st.selectbox("Sort by", ["ID", "Date", "Type", "Description", "Amount", "From Account", "To Account"], key="sort_column")
-        sort_ascending = st.checkbox("Sort Ascending", value=True, key="sort_ascending")
+        sort_column = st.selectbox("Sort by", ["ID", "Date", "Type", "Description", "Amount", "From Account", "To Account"], key="sort_column_transactions")
+        sort_ascending = st.checkbox("Sort Ascending", value=True, key="sort_ascending_transactions")
 
         if sort_column:
             df_transactions = df_transactions.sort_values(by=sort_column, ascending=sort_ascending)
@@ -309,9 +309,9 @@ with transactions_placeholder.container():
 # Create vertical sections in the sidebar using expanders
 with st.sidebar.expander("Account Management"):
     st.markdown('<div class="sidebar-section"><h3>Add Account</h3></div>', unsafe_allow_html=True)
-    account_name = st.text_input("Account Name")
-    account_balance = st.number_input("Initial Balance", min_value=0.0)
-    if st.button("Add Account"):
+    account_name = st.text_input("Account Name", key="add_account_name")
+    account_balance = st.number_input("Initial Balance", min_value=0.0, key="add_account_balance")
+    if st.button("Add Account", key="add_account_button"):
         add_account(account_name, account_balance)
         st.success(f"Account '{account_name}' added successfully!")
         # Refresh accounts dynamically
@@ -320,8 +320,8 @@ with st.sidebar.expander("Account Management"):
             st.dataframe(pd.DataFrame(accounts))
 
     st.markdown('<div class="sidebar-section"><h3>Delete Account</h3></div>', unsafe_allow_html=True)
-    account_id_to_delete = st.number_input("Account ID to Delete", min_value=1, step=1)
-    if st.button("Delete Account"):
+    account_id_to_delete = st.number_input("Account ID to Delete", min_value=1, step=1, key="delete_account_id")
+    if st.button("Delete Account", key="delete_account_button"):
         delete_account(account_id_to_delete)
         st.success("Account deleted successfully!")
         # Refresh accounts dynamically
@@ -331,14 +331,14 @@ with st.sidebar.expander("Account Management"):
 
 with st.sidebar.expander("Transaction Management"):
     st.markdown('<div class="sidebar-section"><h3>Add Transaction</h3></div>', unsafe_allow_html=True)
-    transaction_date = st.date_input("Date")
-    transaction_type = st.selectbox("Type", ["DEPOSIT", "EXPENSE", "TRANSFER"])
-    transaction_desc = st.text_input("Description")
-    transaction_amount = st.number_input("Amount", min_value=0.0)
-    from_account = st.selectbox("From Account", [None] + [acc["name"] for acc in accounts])
-    to_account = st.selectbox("To Account", [None] + [acc["name"] for acc in accounts])
+    transaction_date = st.date_input("Date", key="add_transaction_date")
+    transaction_type = st.selectbox("Type", ["DEPOSIT", "EXPENSE", "TRANSFER"], key="add_transaction_type")
+    transaction_desc = st.text_input("Description", key="add_transaction_desc")
+    transaction_amount = st.number_input("Amount", min_value=0.0, key="add_transaction_amount")
+    from_account = st.selectbox("From Account", [None] + [acc["name"] for acc in accounts], key="add_transaction_from_account")
+    to_account = st.selectbox("To Account", [None] + [acc["name"] for acc in accounts], key="add_transaction_to_account")
     uploaded_file = st.file_uploader("Upload File", key="add_transaction_file_uploader")
-    if st.button("Add Transaction"):
+    if st.button("Add Transaction", key="add_transaction_button"):
         file_path = None
         if uploaded_file:
             file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
@@ -357,15 +357,15 @@ with st.sidebar.expander("Transaction Management"):
             df_transactions = pd.DataFrame(transactions, columns=[
                 "ID", "Date", "Type", "Description", "Amount", "From Account", "To Account"
             ])
-            sort_column = st.session_state.get("sort_column", "ID")
-            sort_ascending = st.session_state.get("sort_ascending", True)
+            sort_column = st.session_state.get("sort_column_transactions", "ID")
+            sort_ascending = st.session_state.get("sort_ascending_transactions", True)
             if sort_column:
                 df_transactions = df_transactions.sort_values(by=sort_column, ascending=sort_ascending)
             st.dataframe(df_transactions)
 
     st.markdown('<div class="sidebar-section"><h3>Edit Transaction</h3></div>', unsafe_allow_html=True)
-    transaction_id_to_edit = st.number_input("Transaction ID to Edit", min_value=1, step=1)
-    if st.button("Fetch Transaction Details"):
+    transaction_id_to_edit = st.number_input("Transaction ID to Edit", min_value=1, step=1, key="edit_transaction_id")
+    if st.button("Fetch Transaction Details", key="fetch_transaction_details_button"):
         transaction_to_edit = next((t for t in transactions if t[0] == transaction_id_to_edit), None)
         if transaction_to_edit:
             st.session_state["transaction_to_edit"] = transaction_to_edit
@@ -375,15 +375,15 @@ with st.sidebar.expander("Transaction Management"):
 
     if st.session_state.get("edit_mode"):
         transaction_to_edit = st.session_state["transaction_to_edit"]
-        edit_date = st.date_input("Date", value=pd.to_datetime(transaction_to_edit[1]))
-        edit_type = st.selectbox("Type", ["DEPOSIT", "EXPENSE", "TRANSFER"], index=["DEPOSIT", "EXPENSE", "TRANSFER"].index(transaction_to_edit[2]))
-        edit_desc = st.text_input("Description", value=transaction_to_edit[3])
-        edit_amount = st.number_input("Amount", min_value=0.0, value=transaction_to_edit[4])
+        edit_date = st.date_input("Date", value=pd.to_datetime(transaction_to_edit[1]), key="edit_transaction_date")
+        edit_type = st.selectbox("Type", ["DEPOSIT", "EXPENSE", "TRANSFER"], index=["DEPOSIT", "EXPENSE", "TRANSFER"].index(transaction_to_edit[2]), key="edit_transaction_type")
+        edit_desc = st.text_input("Description", value=transaction_to_edit[3], key="edit_transaction_desc")
+        edit_amount = st.number_input("Amount", min_value=0.0, value=transaction_to_edit[4], key="edit_transaction_amount")
         account_names = [None] + [acc["name"] for acc in accounts]
-        edit_from_account = st.selectbox("From Account", account_names, index=account_names.index(transaction_to_edit[5]))
-        edit_to_account = st.selectbox("To Account", account_names, index=account_names.index(transaction_to_edit[6]))
+        edit_from_account = st.selectbox("From Account", account_names, index=account_names.index(transaction_to_edit[5]), key="edit_transaction_from_account")
+        edit_to_account = st.selectbox("To Account", account_names, index=account_names.index(transaction_to_edit[6]), key="edit_transaction_to_account")
         edit_file_path = st.file_uploader("Upload File", key="edit_transaction_file_uploader")
-        if st.button("Update Transaction"):
+        if st.button("Update Transaction", key="update_transaction_button"):
             file_path = None
             if edit_file_path:
                 file_path = os.path.join(UPLOAD_FOLDER, edit_file_path.name)
@@ -403,15 +403,15 @@ with st.sidebar.expander("Transaction Management"):
                 df_transactions = pd.DataFrame(transactions, columns=[
                     "ID", "Date", "Type", "Description", "Amount", "From Account", "To Account"
                 ])
-                sort_column = st.session_state.get("sort_column", "ID")
-                sort_ascending = st.session_state.get("sort_ascending", True)
+                sort_column = st.session_state.get("sort_column_transactions", "ID")
+                sort_ascending = st.session_state.get("sort_ascending_transactions", True)
                 if sort_column:
                     df_transactions = df_transactions.sort_values(by=sort_column, ascending=sort_ascending)
                 st.dataframe(df_transactions)
 
     st.markdown('<div class="sidebar-section"><h3>Delete Transaction</h3></div>', unsafe_allow_html=True)
-    transaction_id_to_delete = st.number_input("Transaction ID to Delete", min_value=1, step=1)
-    if st.button("Delete Transaction"):
+    transaction_id_to_delete = st.number_input("Transaction ID to Delete", min_value=1, step=1, key="delete_transaction_id")
+    if st.button("Delete Transaction", key="delete_transaction_button"):
         delete_transaction(transaction_id_to_delete)
         st.success("Transaction deleted successfully!")
         # Refresh accounts and transactions dynamically
@@ -423,15 +423,15 @@ with st.sidebar.expander("Transaction Management"):
             df_transactions = pd.DataFrame(transactions, columns=[
                 "ID", "Date", "Type", "Description", "Amount", "From Account", "To Account"
             ])
-            sort_column = st.session_state.get("sort_column", "ID")
-            sort_ascending = st.session_state.get("sort_ascending", True)
+            sort_column = st.session_state.get("sort_column_transactions", "ID")
+            sort_ascending = st.session_state.get("sort_ascending_transactions", True)
             if sort_column:
                 df_transactions = df_transactions.sort_values(by=sort_column, ascending=sort_ascending)
             st.dataframe(df_transactions)
 
 with st.sidebar.expander("Export and Reset"):
     st.markdown('<div class="sidebar-section"><h3>Export Transactions</h3></div>', unsafe_allow_html=True)
-    if st.button("Export Transactions to Excel"):
+    if st.button("Export Transactions to Excel", key="export_transactions_button"):
         excel_path = export_transactions()
         st.download_button(
             label="Download Excel File",
