@@ -384,7 +384,7 @@ with st.sidebar.expander("Transaction Management"):
         edit_to_account = st.selectbox("To Account", account_names, index=account_names.index(transaction_to_edit[6]))
         edit_file_path = st.file_uploader("Upload File", key="edit_transaction_file_uploader")
         if st.button("Update Transaction"):
-            file_path = transaction_to_edit[7]
+            file_path = None
             if edit_file_path:
                 file_path = os.path.join(UPLOAD_FOLDER, edit_file_path.name)
                 with open(file_path, "wb") as f:
